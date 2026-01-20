@@ -92,7 +92,7 @@ function CategoryPage({ categoryName }) {
                 <button
                   onClick={() => addToCart(p, quantities[p.id] || 1)}
                   style={{
-                    backgroundColor: "#ff6600",
+                    backgroundColor: "#be8661",
                     color: "white",
                     border: "none",
                     padding: "5px 10px",
