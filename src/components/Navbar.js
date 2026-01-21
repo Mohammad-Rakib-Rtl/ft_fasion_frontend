@@ -12,7 +12,7 @@ function Navbar() {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: "#ff6600",
+        backgroundColor: "#fff200",
         padding: "10px 40px",
       }}
     >
