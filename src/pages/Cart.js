@@ -26,38 +26,66 @@ function Cart() {
     })),
   };
 
-  try {
-    const res = await fetch("https://web-production-1f7f.up.railway.app/api/checkout/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData),
-    });
+//   try {
+//     const res = await fetch("https://web-production-1f7f.up.railway.app/api/checkout/", {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify(orderData),
+//     });
 
-    if (res.ok) {
-      const data = await res.json();
+//     if (res.ok) {
+//       const data = await res.json();
 
-      // ✅ Decode PDF bytes from hex
-      const pdfBytes = new Uint8Array(
-        data.pdf.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
-      );
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+//       // ✅ Decode PDF bytes from hex
+//       const pdfBytes = new Uint8Array(
+//         data.pdf.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+//       );
+//       const blob = new Blob([pdfBytes], { type: "application/pdf" });
 
-      // ✅ Create temporary download link
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `invoice_${data.order_code}.pdf`;
-      link.click();
+//       // ✅ Create temporary download link
+//       const link = document.createElement("a");
+//       link.href = URL.createObjectURL(blob);
+//       link.download = `invoice_${data.order_code}.pdf`;
+//       link.click();
 
-      alert("✅ Invoice downloaded and emailed successfully!");
-      clearCart();
-    } else {
-      alert("❌ Checkout failed!");
-    }
-  } catch (error) {
-    console.error(error);
-    alert("⚠️ Something went wrong during checkout!");
+//       alert("✅ Invoice downloaded and emailed successfully!");
+//       clearCart();
+//     } else {
+//       alert("❌ Checkout failed!");
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     alert("⚠️ Something went wrong during checkout!");
+//   }
+// };
+
+  const response = await fetch(`https://web-production-1f7f.up.railway.app/api/checkout/`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Checkout failed");
   }
-};
+
+  // 🔽 HANDLE PDF
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "invoice.pdf";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  window.URL.revokeObjectURL(url);
+
+  // ✅ SUCCESS
+  alert("Order placed successfully!");
 
 
   return (
