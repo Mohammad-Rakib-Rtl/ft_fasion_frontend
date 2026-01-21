@@ -17,7 +17,7 @@ function Navbar() {
       }}
     >
       {/* Left side logo/title */}
-      <Link to="/" style={{ textDecoration: "none", color: "white" }}>
+      <Link to="/" style={{ textDecoration: "none", color: "black" }}>
         <h2>🛍️ FT FASHION</h2>
       </Link>
 
@@ -30,13 +30,13 @@ function Navbar() {
           fontSize: "16px",
         }}
       >
-        <Link to="/shoes" style={{ color: "white", textDecoration: "none" }}>
+        <Link to="/shoes" style={{ color: "black", textDecoration: "none" }}>
           Shoes
         </Link>
-        <Link to="/clothes" style={{ color: "white", textDecoration: "none" }}>
+        <Link to="/clothes" style={{ color: "black", textDecoration: "none" }}>
           Clothes
         </Link>
-        <Link to="/bags" style={{ color: "white", textDecoration: "none" }}>
+        <Link to="/bags" style={{ color: "black", textDecoration: "none" }}>
           Bags
         </Link>
       </div>
@@ -45,7 +45,7 @@ function Navbar() {
       <Link
         to="/cart"
         style={{
-          color: "white",
+          color: "black",
           textDecoration: "none",
           fontSize: "1.25rem",
         }}
