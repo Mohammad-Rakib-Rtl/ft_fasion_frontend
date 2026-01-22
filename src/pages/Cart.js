@@ -11,13 +11,18 @@ function Cart() {
   );
 
   const handleCheckout = async () => {
-  const email = prompt("Enter your email to receive the invoice:");
-  if (!email) {
-    alert("⚠️ Please enter a valid email address.");
-    return;
-  }
+  const name = prompt("Enter your full name:");
+  if (!name) return alert("Name is required");
+
+  const phone = prompt("Enter your contact number:");
+  if (!phone) return alert("Contact number is required");
+
+  const email = prompt("Enter your email:");
+  if (!email) return alert("Email is required");
 
   const orderData = {
+    customer_name: name,
+    customer_phone: phone,
     customer_email: email,
     items: cart.map((item) => ({
       product: item.product?.id || item.id,
@@ -31,10 +36,8 @@ function Cart() {
       "https://web-production-1f7f.up.railway.app/api/checkout/",
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderData), // ✅ FIXED
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
       }
     );
 
@@ -42,26 +45,26 @@ function Cart() {
       throw new Error("Checkout failed");
     }
 
-    // 🔽 HANDLE PDF RESPONSE
+    // 🔽 HANDLE PDF DOWNLOAD
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = "invoice.pdf";
+    a.download = "invoice.pdf"; // backend will rename correctly
     document.body.appendChild(a);
     a.click();
     a.remove();
 
     window.URL.revokeObjectURL(url);
-
-    alert("✅ Order placed & invoice downloaded!");
     clearCart();
-  } catch (error) {
-    console.error(error);
-    alert("⚠️ Something went wrong during checkout!");
+    alert("✅ Invoice downloaded successfully!");
+  } catch (err) {
+    console.error(err);
+    alert("❌ Checkout failed");
   }
 };
+
 
 
 
