@@ -1,4 +1,4 @@
-// Home.js - FINAL WORKING VERSION
+// Home.js - Updated version
 
 import React, { useEffect, useState } from "react";
 import { getProducts } from "../api";
@@ -9,29 +9,6 @@ function Home() {
   const [quantities, setQuantities] = useState({});
   const [sizes, setSizes] = useState({});
   const { addToCart } = useCart();
-
-  // Function to convert any image URL to proper Cloudinary URL
-  const getProperImageUrl = (imageUrl) => {
-    if (!imageUrl) return "";
-    
-    // If it starts with /media/, convert to Cloudinary URL
-    if (imageUrl.startsWith('/media/')) {
-      // Replace with your actual Cloudinary cloud name
-      const cloudName = 'di5e3wbjt'; // This should match your Cloudinary cloud name
-      const filename = imageUrl.replace('/media/', '');
-      
-      // Construct Cloudinary URL with transformation parameters for better performance
-      return `https://res.cloudinary.com/${cloudName}/image/upload/w_300,h_300,c_limit/${filename}`;
-    }
-    
-    // If it's already a full URL, return it as is
-    if (imageUrl.startsWith('http') || imageUrl.startsWith('https')) {
-      return imageUrl;
-    }
-    
-    // Fallback: try to construct a full URL
-    return `https://web-production-1f7f.up.railway.app${imageUrl}`;
-  };
 
   useEffect(() => {
     getProducts().then((data) => {
@@ -118,7 +95,7 @@ function Home() {
                   }}
                 >
                   <img
-                    src={getProperImageUrl(p.image)}  // ✅ Use the converted URL here
+                    src={p.image}  // Now this should be a proper Cloudinary URL
                     alt={p.name}
                     style={{
                       width: "150px",
