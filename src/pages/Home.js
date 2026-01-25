@@ -1,3 +1,5 @@
+// Home.js - UPDATED VERSION TO HANDLE CATEGORY IDS
+
 import React, { useEffect, useState } from "react";
 import { getProducts } from "../api";
 import { useCart } from "../context/CartContext";
@@ -8,17 +10,34 @@ function Home() {
   const [sizes, setSizes] = useState({});
   const { addToCart } = useCart();
 
+  // Create a mapping of category IDs to names
+  const categoryNames = {
+    1: "Shoes",
+    2: "Clothes",
+    3: "Bags",
+    4: "Uncategorized" // Add more as needed
+  };
+
   useEffect(() => {
     getProducts().then((data) => {
+      console.log("API Response:", data);
+      
       const reversed = [...data].reverse();
 
-      // ✅ Group products by category name safely
+      // ✅ Group products by category ID
       const grouped = reversed.reduce((acc, product) => {
-        const categoryName = product?.category?.name || "Uncategorized";
+        let categoryName = "Uncategorized";
+        
+        // Get category name from the mapping
+        if (product.category && categoryNames[product.category]) {
+          categoryName = categoryNames[product.category];
+        }
+        
         if (!acc[categoryName]) acc[categoryName] = [];
         acc[categoryName].push(product);
         return acc;
       }, {});
+      
       setGroupedProducts(grouped);
     });
   }, []);
@@ -37,8 +56,8 @@ function Home() {
 
     // 🛑 Prevent adding shoes/clothes without selecting size
     if (
-      (product?.category?.name?.toLowerCase() === "shoes" ||
-        product?.category?.name?.toLowerCase() === "clothes") &&
+      (product?.category === 1 || // Shoes category ID
+       product?.category === 2) && // Clothes category ID
       !size
     ) {
       alert("Please select a size before adding to cart.");
@@ -100,7 +119,14 @@ function Home() {
                       height: "150px",
                       objectFit: "cover",
                       borderRadius: "5px",
+                      border: "1px solid #eee",
                     }}
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/150?text=No+Image";
+                      e.target.style.backgroundColor = "#f5f5f5";
+                      e.target.style.border = "1px solid #ddd";
+                    }}
+                    loading="lazy"
                   />
                   <h3 style={{ margin: "10px 0 5px" }}>{p.name}</h3>
                   <p style={{ color: "#555", fontSize: "14px" }}>
@@ -111,8 +137,7 @@ function Home() {
                   </p>
 
                   {/* ✅ Size Selector for Shoes and Clothes */}
-                  {(p?.category?.name?.toLowerCase() === "shoes" ||
-                    p?.category?.name?.toLowerCase() === "clothes") && (
+                  {(p?.category === 1 || p?.category === 2) && ( // Use category ID instead of name
                     <select
                       value={sizes[p.id] || ""}
                       onChange={(e) => handleSizeChange(p.id, e.target.value)}
@@ -125,7 +150,7 @@ function Home() {
                       }}
                     >
                       <option value="">Select Size</option>
-                      {p.category.name.toLowerCase() === "shoes" ? (
+                      {p.category === 1 ? ( // Shoes category ID
                         <>
                           <option value="36">36</option>
                           <option value="37">37</option>
