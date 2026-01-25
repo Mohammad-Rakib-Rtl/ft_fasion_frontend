@@ -1,5 +1,3 @@
-// Home.js - FINAL WORKING VERSION
-
 import React, { useEffect, useState } from "react";
 import { getProducts } from "../api";
 import { useCart } from "../context/CartContext";
@@ -16,18 +14,11 @@ function Home() {
 
       // ✅ Group products by category name safely
       const grouped = reversed.reduce((acc, product) => {
-        // Check if category exists and has a name
-        let categoryName = "Uncategorized";
-        
-        if (product.category && product.category.name) {
-          categoryName = product.category.name;
-        }
-        
+        const categoryName = product?.category?.name || "Uncategorized";
         if (!acc[categoryName]) acc[categoryName] = [];
         acc[categoryName].push(product);
         return acc;
       }, {});
-      
       setGroupedProducts(grouped);
     });
   }, []);
@@ -102,21 +93,14 @@ function Home() {
                   }}
                 >
                   <img
-                    src={p.image}  // This should be working now
+                    src={p.image}
                     alt={p.name}
                     style={{
                       width: "150px",
                       height: "150px",
                       objectFit: "cover",
                       borderRadius: "5px",
-                      border: "1px solid #eee",
                     }}
-                    onError={(e) => {
-                      e.target.src = "https://via.placeholder.com/150?text=No+Image"; // Fallback image
-                      e.target.style.backgroundColor = "#f5f5f5";
-                      e.target.style.border = "1px solid #ddd";
-                    }}
-                    loading="lazy"
                   />
                   <h3 style={{ margin: "10px 0 5px" }}>{p.name}</h3>
                   <p style={{ color: "#555", fontSize: "14px" }}>
