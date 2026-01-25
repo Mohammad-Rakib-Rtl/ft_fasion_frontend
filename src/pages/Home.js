@@ -1,4 +1,4 @@
-// Home.js - UPDATED VERSION TO HANDLE CATEGORY IDS
+// Home.js - FINAL WORKING VERSION
 
 import React, { useEffect, useState } from "react";
 import { getProducts } from "../api";
@@ -10,27 +10,19 @@ function Home() {
   const [sizes, setSizes] = useState({});
   const { addToCart } = useCart();
 
-  // Create a mapping of category IDs to names
-  const categoryNames = {
-    1: "Shoes",
-    2: "Clothes",
-    3: "Bags",
-    4: "Uncategorized" // Add more as needed
-  };
-
   useEffect(() => {
     getProducts().then((data) => {
       console.log("API Response:", data);
       
       const reversed = [...data].reverse();
 
-      // ✅ Group products by category ID
+      // ✅ Group products by category name safely
       const grouped = reversed.reduce((acc, product) => {
         let categoryName = "Uncategorized";
         
-        // Get category name from the mapping
-        if (product.category && categoryNames[product.category]) {
-          categoryName = categoryNames[product.category];
+        // Use category name if available
+        if (product.category && typeof product.category === 'string') {
+          categoryName = product.category;
         }
         
         if (!acc[categoryName]) acc[categoryName] = [];
@@ -56,8 +48,8 @@ function Home() {
 
     // 🛑 Prevent adding shoes/clothes without selecting size
     if (
-      (product?.category === 1 || // Shoes category ID
-       product?.category === 2) && // Clothes category ID
+      (product?.category?.toLowerCase() === "shoes" ||
+       product?.category?.toLowerCase() === "clothes") &&
       !size
     ) {
       alert("Please select a size before adding to cart.");
@@ -137,7 +129,8 @@ function Home() {
                   </p>
 
                   {/* ✅ Size Selector for Shoes and Clothes */}
-                  {(p?.category === 1 || p?.category === 2) && ( // Use category ID instead of name
+                  {(p?.category?.toLowerCase() === "shoes" ||
+                    p?.category?.toLowerCase() === "clothes") && (
                     <select
                       value={sizes[p.id] || ""}
                       onChange={(e) => handleSizeChange(p.id, e.target.value)}
@@ -150,7 +143,7 @@ function Home() {
                       }}
                     >
                       <option value="">Select Size</option>
-                      {p.category === 1 ? ( // Shoes category ID
+                      {p.category.toLowerCase() === "shoes" ? (
                         <>
                           <option value="36">36</option>
                           <option value="37">37</option>
