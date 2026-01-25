@@ -1,4 +1,4 @@
-// Home.js - Updated version with image URL handling
+// Home.js - FINAL WORKING VERSION
 
 import React, { useEffect, useState } from "react";
 import { getProducts } from "../api";
@@ -10,8 +10,8 @@ function Home() {
   const [sizes, setSizes] = useState({});
   const { addToCart } = useCart();
 
-  // Function to convert local media paths to Cloudinary URLs
-  const getCloudinaryImageUrl = (imageUrl) => {
+  // Function to convert any image URL to proper Cloudinary URL
+  const getProperImageUrl = (imageUrl) => {
     if (!imageUrl) return "";
     
     // If it starts with /media/, convert to Cloudinary URL
@@ -19,11 +19,18 @@ function Home() {
       // Replace with your actual Cloudinary cloud name
       const cloudName = 'di5e3wbjt'; // This should match your Cloudinary cloud name
       const filename = imageUrl.replace('/media/', '');
-      return `https://res.cloudinary.com/${cloudName}/image/upload/${filename}`;
+      
+      // Construct Cloudinary URL with transformation parameters for better performance
+      return `https://res.cloudinary.com/${cloudName}/image/upload/w_300,h_300,c_limit/${filename}`;
     }
     
-    // Return original URL if it's already a full URL
-    return imageUrl;
+    // If it's already a full URL, return it as is
+    if (imageUrl.startsWith('http') || imageUrl.startsWith('https')) {
+      return imageUrl;
+    }
+    
+    // Fallback: try to construct a full URL
+    return `https://web-production-1f7f.up.railway.app${imageUrl}`;
   };
 
   useEffect(() => {
@@ -111,17 +118,21 @@ function Home() {
                   }}
                 >
                   <img
-                    src={getCloudinaryImageUrl(p.image)}  // ✅ Use the converted URL here
+                    src={getProperImageUrl(p.image)}  // ✅ Use the converted URL here
                     alt={p.name}
                     style={{
                       width: "150px",
                       height: "150px",
                       objectFit: "cover",
                       borderRadius: "5px",
+                      border: "1px solid #eee",
                     }}
                     onError={(e) => {
                       e.target.src = "https://via.placeholder.com/150?text=No+Image"; // Fallback image
+                      e.target.style.backgroundColor = "#f5f5f5";
+                      e.target.style.border = "1px solid #ddd";
                     }}
+                    loading="lazy"
                   />
                   <h3 style={{ margin: "10px 0 5px" }}>{p.name}</h3>
                   <p style={{ color: "#555", fontSize: "14px" }}>
