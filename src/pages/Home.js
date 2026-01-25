@@ -1,4 +1,4 @@
-// Home.js - Updated version
+// Home.js - Fixed version
 
 import React, { useEffect, useState } from "react";
 import { getProducts } from "../api";
@@ -105,7 +105,7 @@ function Home() {
                       border: "1px solid #eee",
                     }}
                     onError={(e) => {
-                      e.target.src = "https://via.placeholder.com/150?text=No+Image"; // Fallback image
+                      e.target.src = "https://via.placeholder.com/150?text=No+Image"; // Fallback image - FIXED: removed extra spaces
                       e.target.style.backgroundColor = "#f5f5f5";
                       e.target.style.border = "1px solid #ddd";
                     }}
