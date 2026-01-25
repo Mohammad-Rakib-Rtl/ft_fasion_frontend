@@ -1,3 +1,5 @@
+// Home.js - Updated version with image URL handling
+
 import React, { useEffect, useState } from "react";
 import { getProducts } from "../api";
 import { useCart } from "../context/CartContext";
@@ -7,6 +9,22 @@ function Home() {
   const [quantities, setQuantities] = useState({});
   const [sizes, setSizes] = useState({});
   const { addToCart } = useCart();
+
+  // Function to convert local media paths to Cloudinary URLs
+  const getCloudinaryImageUrl = (imageUrl) => {
+    if (!imageUrl) return "";
+    
+    // If it starts with /media/, convert to Cloudinary URL
+    if (imageUrl.startsWith('/media/')) {
+      // Replace with your actual Cloudinary cloud name
+      const cloudName = 'di5e3wbjt'; // This should match your Cloudinary cloud name
+      const filename = imageUrl.replace('/media/', '');
+      return `https://res.cloudinary.com/${cloudName}/image/upload/${filename}`;
+    }
+    
+    // Return original URL if it's already a full URL
+    return imageUrl;
+  };
 
   useEffect(() => {
     getProducts().then((data) => {
@@ -93,13 +111,16 @@ function Home() {
                   }}
                 >
                   <img
-                    src={p.image}
+                    src={getCloudinaryImageUrl(p.image)}  // ✅ Use the converted URL here
                     alt={p.name}
                     style={{
                       width: "150px",
                       height: "150px",
                       objectFit: "cover",
                       borderRadius: "5px",
+                    }}
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/150?text=No+Image"; // Fallback image
                     }}
                   />
                   <h3 style={{ margin: "10px 0 5px" }}>{p.name}</h3>
