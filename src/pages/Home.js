@@ -1,11 +1,10 @@
-// Home.js - COMPLETE SOLUTION WITH CATEGORY FILTERING
+// Home.js - FIXED VERSION WITHOUT UNUSED VARIABLE
 
 import React, { useEffect, useState, useMemo } from "react";
 import { getProducts } from "../api";
 import { useCart } from "../context/CartContext";
 
 function Home() {
-  const [allProducts, setAllProducts] = useState([]);
   const [groupedProducts, setGroupedProducts] = useState({});
   const [quantities, setQuantities] = useState({});
   const [sizes, setSizes] = useState({});
@@ -15,8 +14,6 @@ function Home() {
   useEffect(() => {
     getProducts().then((data) => {
       console.log("API Response:", data);
-      
-      setAllProducts(data);
       
       // Group all products by category name
       const grouped = data.reduce((acc, product) => {
