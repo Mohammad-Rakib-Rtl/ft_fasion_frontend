@@ -1,28 +1,41 @@
-// Home.js - FINAL WORKING VERSION
+// Home.js - COMPLETE SOLUTION WITH CATEGORY FILTERING
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { getProducts } from "../api";
 import { useCart } from "../context/CartContext";
 
 function Home() {
+  const [allProducts, setAllProducts] = useState([]);
   const [groupedProducts, setGroupedProducts] = useState({});
   const [quantities, setQuantities] = useState({});
   const [sizes, setSizes] = useState({});
+  const [currentCategory, setCurrentCategory] = useState('all'); // 'all', 'shoes', 'clothes', 'bags'
   const { addToCart } = useCart();
 
   useEffect(() => {
     getProducts().then((data) => {
       console.log("API Response:", data);
       
-      const reversed = [...data].reverse();
-
-      // ✅ Group products by category name safely
-      const grouped = reversed.reduce((acc, product) => {
+      setAllProducts(data);
+      
+      // Group all products by category name
+      const grouped = data.reduce((acc, product) => {
         let categoryName = "Uncategorized";
         
-        // Use category name if available
+        // Get category name from product.category (could be string or object)
         if (product.category && typeof product.category === 'string') {
           categoryName = product.category;
+        } else if (product.category && product.category.name) {
+          categoryName = product.category.name;
+        } else if (product.category) {
+          // If category is just an ID, map it to name
+          const categoryMap = {
+            1: "Shoes",
+            2: "Clothes",
+            3: "Bags",
+            4: "Uncategorized"
+          };
+          categoryName = categoryMap[product.category] || "Uncategorized";
         }
         
         if (!acc[categoryName]) acc[categoryName] = [];
@@ -33,6 +46,32 @@ function Home() {
       setGroupedProducts(grouped);
     });
   }, []);
+
+  // Filter products based on current category
+  const filteredProducts = useMemo(() => {
+    if (currentCategory === 'all') {
+      return groupedProducts;
+    }
+    
+    // Convert currentCategory to match category names
+    const categoryMap = {
+      'shoes': ['Shoes', 'shoes'],
+      'clothes': ['Clothes', 'clothes'],
+      'bags': ['Bags', 'bags']
+    };
+    
+    const matchingCategories = categoryMap[currentCategory] || [];
+    
+    const filtered = {};
+    Object.entries(groupedProducts).forEach(([category, products]) => {
+      if (matchingCategories.includes(category) || 
+          matchingCategories.some(cat => category.toLowerCase() === cat.toLowerCase())) {
+        filtered[category] = products;
+      }
+    });
+    
+    return filtered;
+  }, [currentCategory, groupedProducts]);
 
   const handleQuantityChange = (id, value) => {
     setQuantities((prev) => ({ ...prev, [id]: parseInt(value) || 1 }));
@@ -59,16 +98,89 @@ function Home() {
     addToCart(product, quantity, size);
   };
 
+  // Handle category navigation
+  const navigateToCategory = (category) => {
+    setCurrentCategory(category);
+  };
+
+  // Get current page title
+  const getPageTitle = () => {
+    if (currentCategory === 'shoes') return 'Shoes Collection';
+    if (currentCategory === 'clothes') return 'Clothes Collection';
+    if (currentCategory === 'bags') return 'Bags Collection';
+    return 'FT FASHION STORE PRODUCTS';
+  };
+
   return (
     <div style={{ padding: "40px" }}>
+      {/* Navigation Bar */}
+      <nav style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+        <button 
+          onClick={() => navigateToCategory('all')}
+          style={{
+            margin: '0 10px',
+            padding: '8px 16px',
+            backgroundColor: currentCategory === 'all' ? '#ff6600' : 'transparent',
+            color: currentCategory === 'all' ? 'white' : 'black',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          All
+        </button>
+        <button 
+          onClick={() => navigateToCategory('shoes')}
+          style={{
+            margin: '0 10px',
+            padding: '8px 16px',
+            backgroundColor: currentCategory === 'shoes' ? '#ff6600' : 'transparent',
+            color: currentCategory === 'shoes' ? 'white' : 'black',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Shoes
+        </button>
+        <button 
+          onClick={() => navigateToCategory('clothes')}
+          style={{
+            margin: '0 10px',
+            padding: '8px 16px',
+            backgroundColor: currentCategory === 'clothes' ? '#ff6600' : 'transparent',
+            color: currentCategory === 'clothes' ? 'white' : 'black',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Clothes
+        </button>
+        <button 
+          onClick={() => navigateToCategory('bags')}
+          style={{
+            margin: '0 10px',
+            padding: '8px 16px',
+            backgroundColor: currentCategory === 'bags' ? '#ff6600' : 'transparent',
+            color: currentCategory === 'bags' ? 'white' : 'black',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Bags
+        </button>
+      </nav>
+
       <h2 style={{ textAlign: "center", marginBottom: "30px" }}>
-        🛍️ FT FASHION STORE PRODUCTS
+        {getPageTitle()}
       </h2>
 
-      {Object.keys(groupedProducts).length === 0 ? (
-        <p style={{ textAlign: "center" }}>Loading products...</p>
+      {Object.keys(filteredProducts).length === 0 ? (
+        <p style={{ textAlign: "center" }}>No products found.</p>
       ) : (
-        Object.entries(groupedProducts).map(([category, products]) => (
+        Object.entries(filteredProducts).map(([category, products]) => (
           <div key={category} style={{ marginBottom: "40px" }}>
             <h2
               style={{
