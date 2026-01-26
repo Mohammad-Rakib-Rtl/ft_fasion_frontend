@@ -1,3 +1,5 @@
+// CategoryPage.js - FIXED VERSION
+
 import React, { useEffect, useState } from "react";
 import { getProducts } from "../api";
 import { useCart } from "../context/CartContext";
@@ -8,18 +10,35 @@ function CategoryPage({ categoryName }) {
   const { addToCart } = useCart();
 
   useEffect(() => {
-  getProducts().then((data) => {
-    const filtered = data.filter((p) => {
-      const catName = p?.category?.name
-        ? p.category.name.toLowerCase()
-        : "";
-      return catName === categoryName.toLowerCase();
+    getProducts().then((data) => {
+      console.log("Category Page - API Data:", data);
+      
+      const filtered = data.filter((p) => {
+        let catName = "";
+        
+        // Handle different category formats
+        if (p.category && typeof p.category === 'string') {
+          catName = p.category.toLowerCase();
+        } else if (p.category && p.category.name) {
+          catName = p.category.name.toLowerCase();
+        } else if (typeof p.category === 'number') {
+          // Map category IDs to names
+          const categoryMap = {
+            1: "shoes",
+            2: "clothes",
+            3: "bags",
+            4: "uncategorized"
+          };
+          catName = categoryMap[p.category] || "";
+        }
+        
+        return catName === categoryName.toLowerCase();
+      });
+      
+      console.log(`Filtered ${categoryName} products:`, filtered);
+      setProducts(filtered.reverse());
     });
-    setProducts(filtered.reverse());
-  });
-}, [categoryName]);
-
-
+  }, [categoryName]);
 
   const handleQuantityChange = (id, value) => {
     setQuantities((prev) => ({ ...prev, [id]: parseInt(value) || 1 }));
@@ -38,7 +57,12 @@ function CategoryPage({ categoryName }) {
       </h1>
 
       {products.length === 0 ? (
-        <p style={{ textAlign: "center" }}>No products found.</p>
+        <div style={{ textAlign: "center", padding: "40px" }}>
+          <p>No products found.</p>
+          <p style={{ color: "#666", fontSize: "14px" }}>
+            Try checking your backend database or API response format.
+          </p>
+        </div>
       ) : (
         <div
           style={{
@@ -69,7 +93,14 @@ function CategoryPage({ categoryName }) {
                   height: "150px",
                   objectFit: "cover",
                   borderRadius: "5px",
+                  border: "1px solid #eee",
                 }}
+                onError={(e) => {
+                  e.target.src = "https://via.placeholder.com/150?text=No+Image";
+                  e.target.style.backgroundColor = "#f5f5f5";
+                  e.target.style.border = "1px solid #ddd";
+                }}
+                loading="lazy"
               />
               <h3>{p.name}</h3>
               <p style={{ fontSize: "13px", color: "#999", marginTop: "-5px" }}>
@@ -77,7 +108,7 @@ function CategoryPage({ categoryName }) {
               </p>
               <p style={{ color: "#555", fontSize: "14px" }}>{p.description}</p>
               <p>
-                <strong>${p.price}</strong>
+                <strong>{p.price} BDT</strong>
               </p>
               <div style={{ marginTop: "10px" }}>
                 <input
