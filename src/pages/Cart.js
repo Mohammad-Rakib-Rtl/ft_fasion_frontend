@@ -84,7 +84,7 @@ function Cart() {
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#ff6600", color: "white" }}>
+              <tr style={{ backgroundColor: "#000000", color: "white" }}>
                 <th style={{ padding: "10px", border: "1px solid #ddd" }}>
                   Product
                 </th>

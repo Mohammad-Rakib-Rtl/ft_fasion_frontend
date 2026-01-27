@@ -17,7 +17,7 @@ function Navbar() {
       }}
     >
       {/* Left side logo/title */}
-      <Link to="/" style={{ textDecoration: "none", color: "black" }}>
+      <Link to="/" style={{ textDecoration: "none", color: "white" }}>
         <h2>🛍️ GO FASHION</h2>
       </Link>
 
