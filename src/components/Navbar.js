@@ -12,13 +12,13 @@ function Navbar() {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: "#fff200",
+        backgroundColor: "#000000",
         padding: "10px 40px",
       }}
     >
       {/* Left side logo/title */}
       <Link to="/" style={{ textDecoration: "none", color: "black" }}>
-        <h2>🛍️ FT FASHION</h2>
+        <h2>🛍️ GO FASHION</h2>
       </Link>
 
       {/* Center category links */}
@@ -30,13 +30,13 @@ function Navbar() {
           fontSize: "16px",
         }}
       >
-        <Link to="/shoes" style={{ color: "black", textDecoration: "none" }}>
+        <Link to="/shoes" style={{ color: "white", textDecoration: "none" }}>
           Shoes
         </Link>
-        <Link to="/clothes" style={{ color: "black", textDecoration: "none" }}>
+        <Link to="/clothes" style={{ color: "white", textDecoration: "none" }}>
           Clothes
         </Link>
-        <Link to="/bags" style={{ color: "black", textDecoration: "none" }}>
+        <Link to="/bags" style={{ color: "white", textDecoration: "none" }}>
           Bags
         </Link>
       </div>
@@ -45,7 +45,7 @@ function Navbar() {
       <Link
         to="/cart"
         style={{
-          color: "black",
+          color: "white",
           textDecoration: "none",
           fontSize: "1.25rem",
         }}
